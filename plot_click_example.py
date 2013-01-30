@@ -1,12 +1,12 @@
 """Test to get mouse position in plot.
 
 Examples
-========
+--------
 >>> from plot_click_example import plot_click
 >>> plot_click()
 
 References
-==========
+----------
 http://bmi.bmt.tue.nl/~philbers/8C080/matplotlibtutorial.html
 
 """

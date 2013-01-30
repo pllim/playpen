@@ -1,7 +1,7 @@
 """Multiprocessing.
 
 References
-==========
+----------
 http://docs.python.org/library/multiprocessing.html
 http://blog.doughellmann.com/2009/04/pymotw-multiprocessing-part-1.html
 http://broadcast.oreilly.com/2009/04/pymotw-multiprocessing-part-2.html
