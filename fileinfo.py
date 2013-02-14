@@ -93,3 +93,26 @@ def get_latest_file(searchString):
     """
     return os.path.abspath(
         max((os.stat(f).st_mtime,f) for f in glob.iglob(searchString))[1])
+
+
+def get_first_found(file_list):
+    """Find a list of files, given in the order of descending
+    priorities, until one is found.
+
+    Parameters
+    ----------
+    file_list : list of str
+        List of files given in descending order.
+
+    Returns
+    -------
+    f : str or `None`
+        First file found in the given list.
+        Returns `None` if none found.
+
+    """
+    for f in file_list:
+        if os.path.exists(f):
+            return f
+        else:
+            return find_file(file_list[1:])
