@@ -2,4 +2,4 @@
 
 def round_odd(x):
     """Round X to nearest odd integer."""
-    return int(round(x) + 1 - round(x % 2))
+    return int(x + 1 - x % 2)
