@@ -5,49 +5,51 @@ import numpy as np
 from astropy.io import fits
 
 
-def fill_empty_ext(infits, outfits, kw='PIXVALUE'):
-    """Fill empty ERR and DQ extensions with PIXVALUE.
+def remove_pixvalue(infits, outfits):
+    """Convert ``PIXVALUE`` to real extension.
 
-    CALXXX writes out null arrays on ERR and DQ when
-    they are all constant. This is useful to conserve
-    disk space. Instead their header has PIXVALUE
-    keyword with that constant.
+    CFITSIO (used by CALXXX) writes out null extension when
+    it is a constant array. This is useful to conserve
+    disk space. Instead the data is stored in its header
+    using special keywords like ``PIXVALUE`` and ``NPIX*``.
 
-    But this also causes subsequent manual processing
-    on those extensions to fail. The workaround is to
-    fill the empty extension(s) with PIXVALUE in the shape
-    of SCI extension(s).
+    Subsequent processing on such extension causes confusion
+    when used with `pyfits` (as of v3.2.dev), IRAF ``catfits``,
+    and DS9. Situation arises where the data is no longer a
+    constant array but the special keywords are still present,
+    causing the extension to erroneously be interpreted still
+    as a constant array.
+
+    To fix this, this function:
+
+        * Removes ``PIXVALUE``, ``NPIX*``, and ``NAXIS`` entries.
+        * Repopulates ``NAXIS*`` keywords with actual data values.
+
+    .. note:: RAW data with real NULL extensions are unaffected.
 
     Parameters
     ----------
     infits : str
-        Input FITS file with empty extension(s).
-        SCI cannot be empty and must appear before
-        corresponding ERR and DQ.
+        Input FITS file to fix.
 
     outfits : str
-        Output FITS file with empty extensions filled
-        with zeros. Existing file is overwritten.
-
-    kw : str
-        Keyword containing PIXVALUE constant to
-        populate extension with.
+        Output FITS file. Existing file is overwritten.
 
     Examples
     --------
-    >>> from fitsconvert import fill_empty_ext
-    >>> fill_empty_ext('jc4b11ouq_flt.fits', 'jc4b11ouq_flt_filled.fits')
+    >>> from fitsconvert import remove_pixvalue
+    >>> remove_pixvalue('jc4b11ouq_flt.fits', 'jc4b11ouq_flt_fixed.fits')
 
     """
-    out_shape = ()
-
     with fits.open(infits) as pf_in:
         for ext in pf_in:
-            if ext.name == 'SCI':
-                out_shape = ext.shape
-            elif ext.name == 'ERR' and ext.shape == ():
-                ext.data = np.zeros(out_shape, dtype='float32') + ext.header[kw]
-            elif ext.name == 'DQ' and ext.shape == ():
-                ext.data = np.zeros(out_shape, dtype='int16') + ext.header[kw]
+            if 'PIXVALUE' in ext.header and ext.data is not None:
+                del ext.header['PIXVALUE']
+                del ext.header['NPIX1']
+                del ext.header['NPIX2']
+                del ext.header['NAXIS']
+                ext.header['NAXIS'] = ext.data.ndim
+                ext.header['NAXIS1'] = ext.data.shape[1]
+                ext.header['NAXIS2'] = ext.data.shape[0]
 
         pf_in.writeto(outfits, clobber=True)
