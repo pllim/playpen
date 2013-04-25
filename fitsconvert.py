@@ -1,7 +1,6 @@
 """Unconventional FITS manipulation."""
 
 # THIRD-PARTY
-import numpy as np
 from astropy.io import fits
 
 
