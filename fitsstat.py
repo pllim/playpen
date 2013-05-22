@@ -18,6 +18,8 @@ Plot histograms for ext=('sci',1) for 2 images between 0.1 and 10.0 counts:
 >>> fitsstat.imhist('im1.fits', 'im2.fits', z1=0.1, z2=10.0)
 
 """
+from __future__ import print_function, division
+
 # STDLIB
 import glob
 import os
@@ -26,7 +28,7 @@ import sys
 # THIRD-PARTY
 import matplotlib.pyplot as plt
 import numpy as np
-import pyfits
+from astropy.io import fits as pyfits
 
 
 __author__ = 'Pey Lian Lim'
@@ -211,3 +213,73 @@ def imhist(*args, **kwargs):
 
     if not kwargs.get('show_plot', True):
         plt.close()
+
+
+def has_nan(image, verbose=True):
+    """Check for invalid numbers in FITS image data.
+    Extensions with no data (e.g., primary header) are skipped.
+
+    Parameters
+    ----------
+    image : str
+        FITS image name.
+
+    verbose : bool, optional
+        Print information to screen.
+
+    Returns
+    -------
+    status : bool
+        True if any of the data extensions has nan or inf, else False.
+
+    Examples
+    --------
+    This file has nan values in EXT 5:
+
+    >>> has_nan('/grp/hst/cdbs/jref/tam17023j_drk.fits')
+    /grp/hst/cdbs/jref/tam17023j_drk.fits EXT (ERR,2)
+        nan/inf found at
+        IRAF X,Y =   1312,   189
+        IRAF X,Y =   1312,   190
+        IRAF X,Y =   1312,   191
+        IRAF X,Y =   1312,   192
+        IRAF X,Y =   1312,   193
+        IRAF X,Y =   1312,   194
+        IRAF X,Y =   1312,   195
+        IRAF X,Y =   1312,   196
+        IRAF X,Y =   1312,   197
+        IRAF X,Y =   1312,   198
+        IRAF X,Y =   1312,   199
+        IRAF X,Y =   2589,   367
+        IRAF X,Y =   1057,   830
+        IRAF X,Y =   1057,  1116
+        IRAF X,Y =   1457,  1754
+    True
+
+    This file does not have nan or inf in all data extensions:
+
+    >>> has_nan('/grp/hst/cdbs/jref/tam17023j_drk.fits')
+    /grp/hst/cdbs/jref/tam17023j_drk.fits OK
+    False
+
+    """
+    status = found = False
+    with pyfits.open(image) as pf:
+        for ext in pf:
+            if ext.data is not None:
+                mask = ~np.isfinite(ext.data)
+                found = np.any(mask)
+            if found:
+                if not status:
+                    status = found
+                if verbose:
+                    print('{0} EXT ({1},{2})'.format(
+                            image, ext.name, ext._extver))
+                    print('    nan/inf found at')
+                    for y, x in zip(*np.where(mask)):
+                        print('    IRAF X,Y = {0:6d},{1:6d}'.format(x+1, y+1))
+                else:
+                    break
+    if not status and verbose:
+        print(image, 'OK')
+    return status
