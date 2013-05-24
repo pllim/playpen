@@ -266,7 +266,7 @@ def has_nan(image, verbose=True):
     status = found = False
     with pyfits.open(image) as pf:
         for ext in pf:
-            if ext.data is not None:
+            if ext.is_image and ext.data is not None:
                 mask = ~np.isfinite(ext.data)
                 found = np.any(mask)
             if found:
