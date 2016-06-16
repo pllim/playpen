@@ -250,7 +250,7 @@ def ap_tprofder(npix, center, sigma, ampl=1.0):
     data = np.zeros(npix)
     der = np.zeros(npix)
 
-    x = (np.arange(npix) - center) / (sigma * gaussian_sigma_to_fwhm)
+    x = (np.arange(npix) - center + 0.5) / (sigma * gaussian_sigma_to_fwhm)
     xabs = np.abs(x)
 
     mask = xabs <= 1
