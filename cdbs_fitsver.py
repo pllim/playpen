@@ -1,4 +1,5 @@
-"""CDBS FITS verification.
+"""
+CDBS FITS verification.
 
 Requires
 --------
