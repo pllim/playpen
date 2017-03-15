@@ -1,4 +1,5 @@
-"""Python implementation of IRAF `blkavg` task.
+"""
+Python implementation of IRAF `blkavg` task.
 
 Examples
 --------
