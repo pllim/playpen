@@ -1,4 +1,5 @@
-"""Test to get mouse position in plot.
+"""
+Test to get mouse position in plot.
 
 Examples
 --------
@@ -10,6 +11,8 @@ References
 http://bmi.bmt.tue.nl/~philbers/8C080/matplotlibtutorial.html
 
 """
+from __future__ import print_function
+
 # THIRD PARTY
 import matplotlib.pyplot as plt
 import numpy as np
@@ -36,7 +39,7 @@ def _on_click(event):
     """Print and mark clicked coordinates."""
 
     # Print data coordinates to screen
-    print 'X, Y:', event.xdata, event.ydata
+    print('X, Y:', event.xdata, event.ydata)
 
     # Mark them on plot too
     plt.plot(event.xdata, event.ydata, 'rx')
