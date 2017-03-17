@@ -1,4 +1,5 @@
-"""Sky fitting.
+"""
+Sky fitting.
 
 These functions were ported from IDL codes used by
 ACS/WFC reference files generation and statistics.
@@ -6,12 +7,12 @@ ACS/WFC reference files generation and statistics.
 Examples
 --------
 >>> import matplotlib.pyplot as plt
->>> import pyfits
+>>> from astropy.io import fits
 >>> import skyfit
 
 Read EXT 1 of ACS/WFC superbias image:
 
->>> im = pyfits.getdata('x1o1958ej_bia.fits', 1)
+>>> im = fits.getdata('x1o1958ej_bia.fits', 1)
 
 Calculate clipped mean for each row and plot it:
 
@@ -24,7 +25,7 @@ polynomial fitting:
 >>> m, s = skyfit.msky(im, do_plot=True, verbose=True, ptitle='bias')
 
 """
-from __future__ import print_function
+from __future__ import division, print_function
 
 # STDLIB
 import logging
