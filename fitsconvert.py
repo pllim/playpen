@@ -5,7 +5,8 @@ from astropy.io import fits
 
 
 def remove_pixvalue(infits, outfits):
-    """Convert ``PIXVALUE`` to real extension.
+    """
+    Convert ``PIXVALUE`` to real extension.
 
     CFITSIO (used by CALXXX) writes out null extension when
     it is a constant array. This is useful to conserve
@@ -51,4 +52,4 @@ def remove_pixvalue(infits, outfits):
                 ext.header['NAXIS1'] = ext.data.shape[1]
                 ext.header['NAXIS2'] = ext.data.shape[0]
 
-        pf_in.writeto(outfits, clobber=True)
+        pf_in.writeto(outfits, overwrite=True)
