@@ -8,7 +8,7 @@ Examples
 
 """
 
-from __future__ import division
+from __future__ import division, print_function
 
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
@@ -48,7 +48,7 @@ def blkavg2d(in_arr, blockshape):
     # Calculate new dimensions
     x_bin = in_arr.shape[1] / xblock
     y_bin = in_arr.shape[0] / yblock
-    out_arr = np.zeros((y_bin,x_bin))
+    out_arr = np.zeros((y_bin, x_bin))
 
     # Average each block
     for j, y1 in enumerate(range(0, in_arr.shape[0], yblock)):
@@ -65,12 +65,12 @@ def blkavg2d(in_arr, blockshape):
 
 
 def blkavg(array, blockshape):
-     blocks = blockview(array, blockshape)
-     axes = range(len(blocks.shape) - 1,
-                  len(blocks.shape) - len(array.shape) - 1, -1)
-     means = np.apply_over_axes(np.mean, blocks, axes)
-     # Drop the extra dimensions
-     return means.reshape(blocks.shape[:len(array.shape)])[:-1, :-1]
+    blocks = blockview(array, blockshape)
+    axes = range(len(blocks.shape) - 1,
+                 len(blocks.shape) - len(array.shape) - 1, -1)
+    means = np.apply_over_axes(np.mean, blocks, axes)
+    # Drop the extra dimensions
+    return means.reshape(blocks.shape[:len(array.shape)])[:-1, :-1]
 
 
 def blockview(array, blocks):
@@ -122,12 +122,12 @@ def test():
     t1 = time.time()
     b = blkavg(a, blockshape)
     t2 = time.time()
-    print 'blkavg took {} s'.format(t2 - t1)
+    print('blkavg took {} s'.format(t2 - t1))
 
     t1 = time.time()
     c = blkavg2d(a, blockshape)
     t2 = time.time()
-    print 'blkavg2d took {} s'.format(t2 - t1)
+    print('blkavg2d took {} s'.format(t2 - t1))
 
     np.testing.assert_array_almost_equal(c, b)
 
