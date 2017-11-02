@@ -1,4 +1,6 @@
 """Disk usage analysis."""
+from __future__ import division, print_function
+
 import glob
 import os
 import pwd
@@ -16,13 +18,11 @@ def usage_by_user(parentPath, displayDirOnly=True):
     Also prints all directoried owned.
     Search one level down only.
 
-    TODO
-    ----
-    Erik Bray:
+    .. todo::
 
         It would be nice to find a more intuitive container structure for
         the path/size info instead of the nested dictionaries, but this
-        certainly works!
+        certainly works! -- Erik Bray
 
     """
     oneLevelDown = os.sep + '*'
@@ -32,7 +32,7 @@ def usage_by_user(parentPath, displayDirOnly=True):
     pathByUser = {}
 
     for path in paths:
-        userID   = os.stat(path).st_uid
+        userID = os.stat(path).st_uid
         usedByte = calc_dir_size(path)
 
         tally[userID] += usedByte
@@ -43,20 +43,20 @@ def usage_by_user(parentPath, displayDirOnly=True):
             else:
                 pathByUser[userID][usedByte] = [path]
         else:
-            pathByUser[userID] = {usedByte:[path]}
+            pathByUser[userID] = {usedByte: [path]}
 
     sortedTally = tally.most_common()
 
-    for key,val in sortedTally:
+    for key, val in sortedTally:
         sortedPathSize = sorted(pathByUser[key].keys(), reverse=True)
 
-        print username_by_uid(key), '\t', human_readable_bytes(val)
-        print
+        print(username_by_uid(key), '\t', human_readable_bytes(val))
+        print()
         for sz in sortedPathSize:
             curPath = pathByUser[key][sz][0]
             if not displayDirOnly or os.path.isdir(curPath):
-                print '\t', curPath, '\t', human_readable_bytes(sz)
-        print
+                print('\t', curPath, '\t', human_readable_bytes(sz))
+        print()
 
 
 def username_by_uid(uid):
@@ -67,8 +67,8 @@ def username_by_uid(uid):
     return user
 
 
+# http://stackoverflow.com/questions/1392413/calculating-a-directory-size-using-python
 def calc_dir_size(path):
-    """ http://stackoverflow.com/questions/1392413/calculating-a-directory-size-using-python """
     used_byte = 0
 
     if os.path.islink(path):
@@ -79,7 +79,8 @@ def calc_dir_size(path):
             for f in filenames:
                 fp = os.path.join(dirpath, f)
 
-                if os.path.islink(fp): continue
+                if os.path.islink(fp):
+                    continue
 
                 used_byte += os.path.getsize(fp)
     else:
@@ -92,12 +93,12 @@ def human_readable_bytes(totalByte):
     """ Disk usage human-readable string. """
 
     # Convert to nearest thousand while still >1
-    numDigits = len( str(totalByte) )
-    numExp    = (numDigits - 1) / 3
+    numDigits = len(str(totalByte))
+    numExp = (numDigits - 1) // 3
     divByThou = 1000 ** numExp
 
     # Find unit name
-    if   numExp == 0:
+    if numExp == 0:
         unitName = 'B'
     elif numExp == 1:
         unitName = 'KB'
@@ -110,7 +111,7 @@ def human_readable_bytes(totalByte):
     else:
         unitName = '>TB'
 
-    return '{:.1f} {}'.format(totalByte/divByThou, unitName)
+    return '{:.1f} {}'.format(totalByte / divByThou, unitName)
 
 
 if __name__ == '__main__':
@@ -121,4 +122,4 @@ if __name__ == '__main__':
     if not os.path.isdir(dir2search):
         raise IOError('Invalid path')
 
-    usage_by_user( dir2search )
+    usage_by_user(dir2search)
