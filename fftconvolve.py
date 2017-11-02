@@ -10,6 +10,8 @@ References
 http://www.rzuser.uni-heidelberg.de/~ge6/Programing/convolution.html
 
 """
+from __future__ import division
+
 # THIRD-PARTY
 import numpy as np
 from numpy.fft import fft2, ifft2
