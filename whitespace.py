@@ -1,4 +1,5 @@
 """Module to handle whitespace in text files."""
+from __future__ import division, print_function
 
 # STDLIB
 import os
@@ -31,21 +32,19 @@ def find_trailing_ws(infile, verbose=True):
 
     n_match = 0
 
-    with open(infile,'r') as fin:
+    with open(infile, 'r') as fin:
         for i, line in enumerate(fin, 1):
             s = line.rstrip(os.linesep)
             if len(s) > 0 and re.search('\s', s[-1]):
                 n_match += 1
 
                 if verbose:
-                    print '{}. Line {}: "{}\\n"'.format(n_match, i, s)
+                    print('{}. Line {}: "{}\\n"'.format(n_match, i, s))
                 else:
                     break  # Stop at first occurence if not verbose
 
     if verbose:
-        print
-        print 'TOTAL:', n_match, 'lines'
-        print
+        print('\nTOTAL:', n_match, 'lines\n\n')
 
     if n_match == 0:
         return False
@@ -73,18 +72,18 @@ def del_trailing_ws(infile, outfile):
     else:
         do_overwrite = False
 
-    fout = open(outfile,'w')
+    fout = open(outfile, 'w')
 
-    with open(infile,'r') as fin:
+    with open(infile, 'r') as fin:
         for line in fin:
             fout.write(line.rstrip() + os.linesep)
 
     fout.close()
 
     if do_overwrite:
-        print outfile, 'overwritten.'
+        print(outfile, 'overwritten.')
     else:
-        print outfile, 'written.'
+        print(outfile, 'written.')
 
 
 if __name__ == '__main__':
