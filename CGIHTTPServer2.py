@@ -26,20 +26,26 @@ NOTES FROM PEY LIAN LIM (STScI)
 * Disabled fork.
 
 """
-
 __version__ = "0.4"
 
 __all__ = ["CGIHTTPRequestHandler"]
 
 import os
 import sys
-import urllib
-import BaseHTTPServer
-import SimpleHTTPServer
 import select
 
+if sys.version_info < (3, 0):  # pragma: py2
+    IS_PY2 = True
+    from urllib import unquote
+    from BaseHTTPServer import HTTPServer
+    from SimpleHTTPServer import SimpleHTTPRequestHandler
+else:  # pragma: py3
+    IS_PY2 = False
+    from urllib.parse import unquote
+    from http.server import HTTPServer, SimpleHTTPRequestHandler, test
 
-class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+
+class CGIHTTPRequestHandler(SimpleHTTPRequestHandler):
 
     """Complete HTTP server with GET, HEAD and POST commands.
 
@@ -50,7 +56,7 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     """
 
     # Determine platform specifics
-    have_fork = False #hasattr(os, 'fork')
+    have_fork = False  # hasattr(os, 'fork')
     have_popen2 = hasattr(os, 'popen2')
     have_popen3 = hasattr(os, 'popen3')
 
@@ -75,7 +81,7 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if self.is_cgi():
             return self.run_cgi()
         else:
-            return SimpleHTTPServer.SimpleHTTPRequestHandler.send_head(self)
+            return SimpleHTTPRequestHandler.send_head(self)
 
     def is_cgi(self):
         """Test whether self.path corresponds to a CGI script.
@@ -172,7 +178,7 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         env['SERVER_PROTOCOL'] = self.protocol_version
         env['SERVER_PORT'] = str(self.server.server_port)
         env['REQUEST_METHOD'] = self.command
-        uqrest = urllib.unquote(rest)
+        uqrest = unquote(rest)
         env['PATH_INFO'] = uqrest
         env['PATH_TRANSLATED'] = self.translate_path(uqrest)
         env['SCRIPT_NAME'] = scriptname
@@ -186,7 +192,8 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
         if authorization:
             authorization = authorization.split()
             if len(authorization) == 2:
-                import base64, binascii
+                import base64
+                import binascii
                 env['AUTH_TYPE'] = authorization[0]
                 if authorization[0].lower() == "basic":
                     try:
@@ -236,7 +243,7 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
             if '=' not in decoded_query:
                 args.append(decoded_query)
             nobody = nobody_uid()
-            self.wfile.flush() # Always flush before forking
+            self.wfile.flush()  # Always flush before forking
             pid = os.fork()
             if pid != 0:
                 # Parent
@@ -321,50 +328,51 @@ class CGIHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
                         sys.argv.append(decoded_query)
                     sys.stdout = self.wfile
                     sys.stdin = self.rfile
-                    execfile(scriptfile, {"__name__": "__main__"})
+                    if IS_PY2:  # pragma: py2
+                        execfile(scriptfile, {"__name__": "__main__"})
+                    else:  # pragma: py3
+                        exec(open(scriptfile).read(), {"__name__": "__main__"})
                 finally:
                     sys.argv = save_argv
                     sys.stdin = save_stdin
                     sys.stdout = save_stdout
                     sys.stderr = save_stderr
                     os.chdir(save_cwd)
-            except SystemExit, sts:
+            except SystemExit as sts:
                 self.log_error("CGI script exit status %s", str(sts))
             else:
                 self.log_message("CGI script exited OK")
 
 
-nobody = None
+NOBODY = None
+
 
 def nobody_uid():
     """Internal routine to get nobody's uid"""
-    global nobody
-    if nobody:
-        return nobody
+    global NOBODY
+
+    if NOBODY:
+        return NOBODY
     try:
         import pwd
     except ImportError:
         return -1
     try:
-        nobody = pwd.getpwnam('nobody')[2]
+        NOBODY = pwd.getpwnam('nobody')[2]
     except KeyError:
-        nobody = 1 + max(map(lambda x: x[2], pwd.getpwall()))
-    return nobody
+        NOBODY = 1 + max(map(lambda x: x[2], pwd.getpwall()))
+    return NOBODY
 
 
 def executable(path):
     """Test for executable file."""
-    try:
-        st = os.stat(path)
-    except os.error:
-        return False
-    return st.st_mode & 0111 != 0
+    return os.path.isfile(path) and os.access(path, os.X_OK)
 
 
-def test(HandlerClass = CGIHTTPRequestHandler,
-         ServerClass = BaseHTTPServer.HTTPServer):
-    SimpleHTTPServer.test(HandlerClass, ServerClass)
+def test2(handler_class=CGIHTTPRequestHandler, server_class=HTTPServer):
+    """Test whether server can be created."""
+    test(handler_class, server_class)
 
 
 if __name__ == '__main__':
-    test()
+    test2()
