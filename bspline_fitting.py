@@ -7,7 +7,10 @@ Examples
 >>> bspline_fitting.test()
 
 """
+from __future__ import print_function
+
 import math
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import interpolate, optimize, signal
@@ -99,7 +102,7 @@ def test():
     chi2 = np.sum(np.power(Spline.errfunc(fittedYnodes, x, y), 2))
     dof = len(ynods) - 1.0
     crit = (math.sqrt(2 * (dof - 1.0)) + 1.635)**2  # Only valid for large dofs
-    print 'Chi**2 {:6.2f} vs {:6.2f}'.format(chi2, crit)
+    print('Chi**2 {:6.2f} vs {:6.2f}'.format(chi2, crit))
 
     # Let's plot the data for visual inspection
     fig = plt.figure()
@@ -108,7 +111,7 @@ def test():
     rect1 = [left, 0.3, width, 0.65]
     rect2 = [left, 0.1, width, 0.2]
 
-    ax1 = fig.add_axes(rect2)  #left, bottom, width, height
+    ax1 = fig.add_axes(rect2)  # left, bottom, width, height
     ax2 = fig.add_axes(rect1)
 
     ax2.plot(x, y, label='Noisy data')
