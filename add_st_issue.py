@@ -1,3 +1,4 @@
+import math
 import re
 import time
 
@@ -6,46 +7,76 @@ try:
 except ImportError:
     raise ImportError('Please conda or pip install github3.py')
 
-ISSUE_BODY = re.sub('(\S+)\n', r'\1 ', """Tyler Desjardins mentions that
-we should consider moving emails from `help[at]stsci.edu` to point to the
-web portal where possible and appropriate.
-For HST (or any non-JWST), it is https://hsthelp.stsci.edu .
-For JWST, it is https://jwsthelp.stsci.edu .
-Please update info in `setup.py`, `setup.cfg`, documentation, etc
-as appropriate.
+ISSUE_TITLE = 'Retire Python 2'
+
+# Two endlines here = one endline on GitHub
+ISSUE_BODY = re.sub('(\S+)\n', r'\1 ', """Python 2 will not be maintained
+past Jan 1, 2020 (see https://pythonclock.org/). Please remove all Python 2
+compatibility and move this package to Python 3 only.
+
+
+For conda recipe (including `astroconda-contrib`), please include the
+following to prevent packaging it for Python 2
+(https://conda.io/docs/user-guide/tasks/build-packages/define-metadata.html?preprocessing-selectors#skipping-builds):
+
+
+```
+
+build:
+
+  skip: true  # [py2k]
+
+```
 
 
 Please close this issue if it is irrelevant to your repository.
 This is an automated issue. *If this is opened in error, please let {0} know!*
-
-
-xref spacetelescope/hstcal#317
 """).strip()
 
 
-def go_forth_and_multiply(owner, gh_token=''):
+def go_forth_and_multiply(owner, listfile, gh_token=''):
     """
     Open issues! Provide a valid token.
     """
     gh = GitHub(token=gh_token)
     user = gh.me()
     body = ISSUE_BODY.format(user)
-    org = gh.organization(owner)
 
-    # Hack to get remaining ones
-    # with open('ztmp.txt') as fin:
-    #     repositories = [s.strip() for s in fin.readlines()]
-    # for reponame in repositories:
+    # Only allowed to spam pre-approved list now.
+    with open(listfile) as fin:
+        repositories = [s.strip() for s in fin.readlines()
+                        if not s.startswith('#')]
 
-    for repo in org.repositories():
-        time.sleep(0.5)  # Prevent API limit but not abuse detection
-        # repo = gh.repository(owner, reponame)  # for hack only
-        try:
-            i = repo.create_issue('Update the help', body=body)
-        except Exception as e:  # denied!
-            print('Skipped {0} -- {1}'.format(repo, str(e)))
-        else:
-            print(i)
+    tot_n = len(repositories)
+
+    if tot_n == 0:
+        print('No repository to process!')
+        return
+
+    max_n_per_chunk = 30
+    n_chunks = math.ceil(tot_n / max_n_per_chunk)
+    i_chunk = 0
+
+    while i_chunk < n_chunks:
+        i_start = i_chunk * max_n_per_chunk
+        i_end = min(i_start + max_n_per_chunk, tot_n)
+
+        for reponame in repositories[i_start:i_end]:
+            time.sleep(0.5)  # Prevent API limit but not abuse detection
+            repo = gh.repository(owner, reponame)
+            if repo.archived:
+                print('Skipped {0} -- archived'.format(repo.name))
+                continue
+            try:
+                i = repo.create_issue('Update the help', body=body)
+            except Exception as e:  # denied!
+                print('Skipped {0} -- {1}'.format(repo.name, str(e)))
+            else:
+                print(i)
+
+        i_chunk += 1
+        if i_chunk < n_chunks:
+            time.sleep(10)  # Prevent abuse detection, maybe
 
 
 def one_repo_only(owner, reponame, gh_token=''):
@@ -56,5 +87,5 @@ def one_repo_only(owner, reponame, gh_token=''):
     user = gh.me()
     body = ISSUE_BODY.format(user)
     repo = gh.repository(owner, reponame)
-    i = repo.create_issue('Update the help', body=body)
+    i = repo.create_issue(ISSUE_TITLE, body=body)
     print(i)
