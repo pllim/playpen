@@ -1,3 +1,8 @@
+"""
+In a holiday party, if each attendee can only gift to one other,
+this might help.
+"""
+
 import random
 from collections import OrderedDict
 
@@ -33,7 +38,26 @@ def select(names, seed=None, max_iter=100, verbose=False):
         raise ValueError('Unable to find match after '
                          '{} tries'.format(max_iter))
 
+    # NOTE: dict is insertion-ordered for Python 3.6+ so usage of
+    #       OrderedDict here is for Python<=3.5 compatibility.
     return OrderedDict(zip(names, choices))
+
+
+# NOTE: Simple profiling with test case indicated that this is 4-5x faster.
+def lazy_select(names, seed=None):
+    """
+    Only shuffle once. But using this, when there are
+    more than 2 names, a combo like ``A->C`` and ``C->A``
+    cannot happen simultaneously.
+    """
+    if seed is not None:
+        random.seed(seed)
+
+    choices = random.sample(names, k=len(names))
+    matches = dict(zip(choices, [choices[-1]] + choices[:-1]))
+
+    # Insist on sorting by input order.
+    return OrderedDict([(name, matches[name]) for name in names])
 
 
 def test_select():
@@ -41,4 +65,12 @@ def test_select():
     assert d['Frodo'] == 'Merry'
     assert d['Sam'] == 'Frodo'
     assert d['Merry'] == 'Pippins'
+    assert d['Pippins'] == 'Sam'
+
+
+def test_lazy_select():
+    d = lazy_select(['Frodo', 'Sam', 'Merry', 'Pippins'], seed=1234)
+    assert d['Frodo'] == 'Pippins'
+    assert d['Sam'] == 'Merry'
+    assert d['Merry'] == 'Frodo'
     assert d['Pippins'] == 'Sam'
