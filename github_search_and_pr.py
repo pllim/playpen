@@ -14,6 +14,9 @@ def search_and_pr(pattern, filename, token=None, login=''):
     start_dir = os.path.abspath(os.curdir)
     search_result = gh.search_code('filename:{} {}'.format(filename, pattern))
 
+    # NOTE: Modify as needed.
+    code_fix = 'test.__test__ = False'
+
     for res in search_result:
         time.sleep(2)  # Prevent GitHub killing stuff
         found = False
@@ -27,10 +30,6 @@ def search_and_pr(pattern, filename, token=None, login=''):
 
         print('Checking {}'.format(repo.full_name))
 
-        # !!!!Test only!!!!!
-        if 'astropy/astrowidgets' not in repo.full_name:
-            continue
-
         # Check if file is affected.
         targfile = res.path
         contents = repo.file_contents(targfile)
@@ -39,7 +38,11 @@ def search_and_pr(pattern, filename, token=None, login=''):
         for i, row in enumerate(lines):
             # NOTE: Modify as needed.
             if 'test = TestRunner.make_test_runner_in' in row:
-                found = True
+                if code_fix in lines[i + 1]:  # Already fixed: no-op
+                    print('Already fixed, skipping {}'.format(repo.full_name))
+                    found = False
+                else:
+                    found = True
                 break
 
         if not found:
@@ -49,7 +52,7 @@ def search_and_pr(pattern, filename, token=None, login=''):
 
         # NOTE: Modify as needed.
         x = row.split('test =')  # x[0] = indentation
-        the_fix = x[0] + 'test.__test__ = False'
+        the_fix = x[0] + code_fix
         lines.insert(i + 1, the_fix)
         new_content = '\n'.join(lines)
 
@@ -61,8 +64,9 @@ def search_and_pr(pattern, filename, token=None, login=''):
 
         try:
             # NOTE: Modify as needed.
-            open_pull_request(fork_repo, repo, 'test_false',
-                              targfile, new_content)
+            open_pull_request(
+                fork_repo, gh.repository(repo.owner, repo.name),
+                'test_false', targfile, new_content)
             print('***** SUCCESS')
         except Exception as e:
             print('***** FAILED: {}'.format(str(e)))
@@ -89,9 +93,10 @@ def open_pull_request(fork, repo, branch, filename, content):
     run_command('git clone {0} .'.format(fork.ssh_url))
 
     # Update to the latest upstream master
-    run_command('git remote add upstream {0}'.format(repo.ssh_url))
-    run_command('git fetch upstream master')
-    run_command('git checkout upstream/master')
+    master = repo.default_branch
+    run_command('git remote add upstream {0}'.format(repo.clone_url))
+    run_command('git fetch upstream {}'.format(master))
+    run_command('git checkout upstream/{}'.format(master))
     run_command('git checkout -b {0}'.format(branch))
 
     # NOTE: Modify as needed.
@@ -109,5 +114,5 @@ def open_pull_request(fork, repo, branch, filename, content):
     run_command('git commit -m "{}"'.format(commit_msg))
     run_command('git push origin {0}'.format(branch))
 
-    repo.create_pull(title=commit_msg, base='master', body=pr_body,
+    repo.create_pull(title=commit_msg, base=master, body=pr_body,
                      head='{0}:{1}'.format(fork.owner.login, branch))
