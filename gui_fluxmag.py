@@ -7,6 +7,7 @@ Usage::
 """
 from math import log10, pow
 import os
+
 import Image
 import ImageTk
 import Tkinter
