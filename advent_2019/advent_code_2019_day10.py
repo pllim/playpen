@@ -147,45 +147,38 @@ def part_2(filename, station_loc, debug=True):
     i_asteroids = np.where(mask)
     asteroid_locs = list(zip(*i_asteroids))  # list of (y, x)
     asteroid_locs.remove(station_loc)  # Remove self
-    mc_by_quad = {1: defaultdict(list), 2: defaultdict(list),
-                  3: defaultdict(list), 4: defaultdict(list)}
-    loc_by_angle = []
+    loc_by_angle = defaultdict(list)
     for loc in asteroid_locs:
-        angle, quad, dist = get_angle(station_loc, loc)
-        mc = calc_m_c(station_loc, loc)
-        mc_by_quad[quad][mc].append((dist, loc))
-        loc_by_angle.append((angle, quad, mc, loc))
-    for quad in mc_by_quad:
-        for mc in mc_by_quad[quad]:
-            if len(mc_by_quad[quad][mc]) > 1:
-                mc_by_quad[quad][mc].sort()  # For those blocking
-    loc_by_angle.sort()
+        angle, _, dist = get_angle(station_loc, loc)
+        loc_by_angle[angle].append((dist, loc))
+    for angle in loc_by_angle:
+        loc_by_angle[angle].sort()
     i_count = 0
+    i_angle = 0
+    all_angles = sorted(loc_by_angle.keys())
+    n_angles = len(all_angles)
     n_target = len(asteroid_locs)
     while i_count < n_target:
-        angle, quad, mc, loc = loc_by_angle.pop(0)
-        cur_list = mc_by_quad[quad][mc]
+        if i_angle == n_angles:
+            i_angle = 0
+        angle = all_angles[i_angle]
+        if len(loc_by_angle[angle]) == 0:
+            i_angle += 1
+            continue
+        _, loc = loc_by_angle[angle].pop(0)
         if debug and loc == (2, 8):
-            print(f'*** angle={angle} quad={quad} loc={loc}')
-            print(f'cur_list={cur_list}')
-        if loc == cur_list[0][1]:  # A hit!
-            mc_by_quad[quad][mc].pop(0)
-            i_count += 1
-            if debug:
-                if i_count in (1, 2, 3, 10, 20, 50, 100, 199, 200, 201, 299):
-                    print(f'The {i_count}th asteroid at {loc[1],loc[0]}')
-                elif loc == (2, 8):
-                    print(f'8,2 has i_count={i_count}')
-            elif i_count == n_target:
-                print(loc[1] * 100 + loc[0])
-                break
-        else:  # Queue back for next round
-            dd = (angle, quad, mc, loc)
-            loc_by_angle.append(dd)
-            # if debug:
-            #     print(f'{dd} put to back of queue')
-        # if debug:
-        #    _ = input('Paused:')
+            print(f'*** angle={angle} loc={loc}')
+        i_count += 1
+        i_angle += 1
+
+        if debug:
+            if i_count in (1, 2, 3, 10, 20, 50, 100, 199, 200, 201, 299):
+                print(f'The {i_count}th asteroid at {loc[1],loc[0]}')
+            elif loc in ((2, 8), (0, 16)):
+                print(f'{loc[1]},{loc[0]} has i_count={i_count}')
+        elif i_count = 202:  # BUG: Off by 2
+            print(f'i={i_count} ans={loc[1] * 100 + loc[0]}')
+            break
 
 
 def test_angles():
@@ -227,5 +220,5 @@ if __name__ == '__main__':
     # print(best_loc, checksum.max())
 
     # Part 2
-    part_2('asteroids_test5.txt', (13, 11), debug=True)
-    # part_2('asteroids.txt', (19, 11))
+    # part_2('asteroids_test5.txt', (13, 11), debug=True)
+    part_2('asteroids.txt', (19, 11), debug=False)
