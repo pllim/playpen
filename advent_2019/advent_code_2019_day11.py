@@ -8,7 +8,7 @@ OPCODE = [3,8,1005,8,338,1106,0,11,0,0,0,104,1,104,0,3,8,1002,8,-1,10,1001,10,1,
 
 # A modified version of the same function in Day 9.
 def process_opcode(opcode_in, i_list=0, inbuf=None, outbuf=sys.stdout,
-                   ibuf=sys.stdout, panels=[], cur_panel=[], debug=False):
+                   ibuf=sys.stdout, panels={}, cur_panel=[], debug=False):
     opcode_list = opcode_in.copy()
     extra_memory = defaultdict(int)  # Store memory beyond max index
     n = len(opcode_list)
@@ -121,12 +121,13 @@ def process_opcode(opcode_in, i_list=0, inbuf=None, outbuf=sys.stdout,
             ibuf.write(str(i_list) + os.linesep)
             ibuf.seek(0)
             if track_output_order == 0:  # color of paint
-                # TODO: Need dict to track panel colors? Maybe panels can be dict
                 track_output_order = 1
-                panels.append(tuple(cur_panel))
-                if debug:
-                    print(f'painted {cur_panel} color={x1}')
-                    # input('Paused:')
+                old_color = panels[tuple(cur_panel)]
+                if old_color != x1:
+                    panels[tuple(cur_panel)] = x1
+                    if debug:
+                        print(f'painted {cur_panel} color={x1}')
+                        # input('Paused:')
             else:  # 1; direction
                 track_output_order = 0
                 if debug:
@@ -231,7 +232,7 @@ def hull_painter(debug=False):
     a_in.seek(0)
     a_out = io.StringIO()
     a_list = io.StringIO()
-    painted_panels = []
+    painted_panels = defaultdict(int)
     cur_panel = [0, 0]  # (y, x)
     exited = False
 
@@ -258,4 +259,4 @@ def hull_painter(debug=False):
 if __name__ == '__main__':
     # Part 1
     panels = hull_painter(debug=False)
-    print(len(set(panels)))
+    print(len(panels))
