@@ -28,6 +28,16 @@ def rename_mvimg(path, from_prefix='MVIMG', to_prefix='IMG', to_suffix='MV',
                 print(f'{filepath} -> {newname}')
 
 
+def append(path, ext, suffix, verbose=False):
+    for filepath in glob.iglob(os.path.join(path, '*.' + ext)):
+        s = filepath.split(f'.{ext}')
+        newname = f'{s[0]}_{suffix}.{ext}'
+        if not os.path.exists(newname):
+            os.rename(filepath, newname)
+            if verbose:
+                print(f'{filepath} -> {newname}')
+
+
 def prepend(path, suffix, prefix, verbose=False):
     for filepath in glob.iglob(os.path.join(path, '*.' + suffix)):
         filename = os.path.basename(filepath)
