@@ -1,7 +1,9 @@
 """Rename some files. For example:
 
-* YYYYMMDD_nnn.jpg becomes IMG_YYYYMMDD_nnn.jpg
-* YYYYMMDD_nnn.mp4 becomes VID_YYYYMMDD_nnn.mp4
+* PXL_YYYYMMDD_nnn.jpg becomes IMG_YYYYMMDD_nnn.jpg
+* PXL_YYYYMMDD_nnn.NIGHT.jpg becomes IMG_YYYYMMDD_nnn.jpg
+* PXL_YYYYMMDD_nnn.MP.jpg becomes IMG_YYYYMMDD_nnn_MV.jpg
+* PXL_YYYYMMDD_nnn.mp4 becomes VID_YYYYMMDD_nnn.mp4
 
 Usage::
 
@@ -14,14 +16,24 @@ import os
 __all__ = []
 
 
-def rename_mvimg(path, from_prefix='MVIMG', to_prefix='IMG', to_suffix='MV',
-                 verbose=False):
-    for filepath in glob.iglob(os.path.join(path, '*.jpg')):
-        filename = os.path.basename(filepath)
-        if not filename.startswith(from_prefix):
-            continue
-        newname = os.path.join(path, filename.replace(
-            from_prefix, to_prefix).replace('.jpg', f'_{to_suffix}.jpg'))
+def undo_pxl(path, verbose=False):
+    pxl_prefix = 'PXL_'
+    for filetype, new_prefix in (('*.jpg', 'IMG_'), ('*.mp4', 'VID_')):
+        for filepath in glob.iglob(os.path.join(path, filetype)):
+            filename = os.path.basename(filepath)
+            if filename.startswith(pxl_prefix):
+                newname = os.path.join(
+                    path, filename.replace(pxl_prefix, new_prefix))
+                if not os.path.exists(newname):
+                    os.rename(filepath, newname)
+                    if verbose:
+                        print(f'{filepath} -> {newname}')
+
+
+def rename_suffix(path, from_suffix='.MP.jpg', to_suffix='_MV.jpg',
+                  verbose=False):
+    for filepath in glob.iglob(os.path.join(path, f'*{from_suffix}')):
+        newname = filepath.replace(from_suffix, to_suffix)
         if not os.path.exists(newname):
             os.rename(filepath, newname)
             if verbose:
@@ -51,9 +63,10 @@ def prepend(path, suffix, prefix, verbose=False):
 
 
 def main(path, verbose=False):
-    prepend(path, 'jpg', 'IMG', verbose=verbose)
-    prepend(path, 'mp4', 'VID', verbose=verbose)
-    rename_mvimg(path, verbose=verbose)
+    undo_pxl(path, verbose=verbose)
+    rename_suffix(path, verbose=verbose)
+    rename_suffix(path, from_suffix='.NIGHT.jpg', to_suffix='.jpg',
+                  verbose=verbose)
 
 
 if __name__ == '__main__':
