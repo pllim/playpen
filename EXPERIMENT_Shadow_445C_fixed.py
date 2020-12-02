@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """This is a modified version from original code in the show
 that actually works.
 
@@ -138,3 +139,19 @@ def find_version_shadow(*file_paths):  # HBO, you like "as" too much
     # are undefined things that break the syntax. Probably only
     # in the show so the Scholar has something to type in the
     # real time as they film.
+
+
+if __name__ == '__main__':
+    # Okay, I'll bite. Let's say you run this script from
+    # command line and it changes directory if a valid directory
+    # name is given.
+    import argparse
+    parser = argparse.ArgumentParser(description='Find that Dust.')
+    parser.add_argument('dirname', type=str, help='directory name')
+    args = parser.parse_args()
+    run_text = locate_run_text(args.dirname)
+    if run_text:
+        print(f'Changing directory to {run_text}')
+        os.chdir(run_text)
+    else:
+        print(f'Directory {args.dirname} not found')
