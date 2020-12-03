@@ -7,10 +7,13 @@ jobs:
   showme:
     runs-on: ubuntu-latest
     steps:
-    #- name: github
-    #  env:
-    #    CTX_GITHUB: ${{ toJson(github) }}
-    #  run: echo $CTX_GITHUB
+    - name: github
+      env:
+        CTX_GITHUB: ${{ toJson(github) }}
+        CTX_EVENT: ${{ toJson(github.event) }}
+      run: |
+        echo $CTX_GITHUB
+        echo $CTX_EVENT
     - name: runner
       env:
         CTX_RUNNER: ${{ toJson(runner) }}
