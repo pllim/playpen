@@ -1,0 +1,21 @@
+name: whoami
+
+on:
+  push:
+
+jobs:
+  showme:
+    runs-on: ubuntu-latest
+    steps:
+    - name: github
+      env:
+        CTX_GITHUB: ${{ github }}
+      run: echo $CTX_GITHUB
+    - name: env
+      env:
+        CTX_ENV: ${{ env }}
+      run: echo $CTX_ENV
+    - name: job
+      env:
+        CTX_JOB: ${{ job }}
+      run: echo $CTX_JOB
