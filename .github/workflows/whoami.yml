@@ -9,13 +9,13 @@ jobs:
     steps:
     - name: github
       env:
-        CTX_GITHUB: ${{ github }}
+        CTX_GITHUB: ${{ toJson(github) }}
       run: echo $CTX_GITHUB
     - name: env
       env:
-        CTX_ENV: ${{ env }}
+        CTX_ENV: ${{ toJson(env) }}
       run: echo $CTX_ENV
     - name: job
       env:
-        CTX_JOB: ${{ job }}
+        CTX_JOB: ${{ toJson(job) }}
       run: echo $CTX_JOB
