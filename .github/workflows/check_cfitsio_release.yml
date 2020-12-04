@@ -1,0 +1,18 @@
+name: Check CFITSIO release
+
+on:
+  push:
+  schedule:
+    # Weekly Monday 6 AM build.
+    # * is a special character in YAML so you have to quote this string.
+    - cron: '0 6 * * 1'
+
+jobs:
+  check_cfitsio:
+    name: Open issue if new release found
+    runs-on: ubuntu-latest
+    - name: Check release
+      uses: pllim/action-check_cfitsio_release@main
+      env:
+        CFITSIO_CHECK_N_DAYS: 300
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
