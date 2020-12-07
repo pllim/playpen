@@ -1,0 +1,19 @@
+name: Check WCSLIB release
+
+on:
+  push:
+  schedule:
+    # Weekly Tuesday 6 AM build.
+    # * is a special character in YAML so you have to quote this string.
+    - cron: '0 6 * * 2'
+
+jobs:
+  check_wcslib:
+    name: Open issue if new release found
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check release
+      uses: pllim/actions-check_wcslib_release@main
+      env:
+        WCSLIB_CHECK_N_DAYS: 7
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
