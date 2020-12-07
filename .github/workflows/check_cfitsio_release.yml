@@ -2,9 +2,9 @@ name: Check CFITSIO release
 
 on:
   schedule:
-    # Weekly Monday 6 AM build.
+    # Weekly Tuesday 6 AM build.
     # * is a special character in YAML so you have to quote this string.
-    - cron: '15 22 * * 1'
+    - cron: '0 6 * * 2'
 
 jobs:
   check_cfitsio:
