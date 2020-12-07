@@ -6,6 +6,8 @@ on:
 jobs:
   showme:
     runs-on: ubuntu-latest
+    # COMMENT OUT TO ENABLE
+    if: github.repository == 'astropy/astropy'
     steps:
     - name: github
       env:
