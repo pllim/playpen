@@ -4,7 +4,7 @@ on:
   schedule:
     # Weekly Monday 6 AM build.
     # * is a special character in YAML so you have to quote this string.
-    - cron: '0 6 * * 1'
+    - cron: '28 14 * * 1'
 
 jobs:
   check_cfitsio:
@@ -14,5 +14,6 @@ jobs:
     - name: Check release
       uses: pllim/actions-check_cfitsio_release@main
       env:
+        CTX_EVENT: ${{ github.event }}
         CFITSIO_CHECK_N_DAYS: 7
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
