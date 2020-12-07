@@ -2,6 +2,10 @@ name: whoami
 
 on:
   push:
+  schedule:
+    # Weekly Monday 6 AM build.
+    # * is a special character in YAML so you have to quote this string.
+    - cron: '15 22 * * 1'
 
 jobs:
   showme:
