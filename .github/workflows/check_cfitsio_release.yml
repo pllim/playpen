@@ -4,7 +4,7 @@ on:
   schedule:
     # Weekly Monday 6 AM build.
     # * is a special character in YAML so you have to quote this string.
-    - cron: '54 21 * * 1'
+    - cron: '0 22 * * 1'
 
 jobs:
   check_cfitsio:
