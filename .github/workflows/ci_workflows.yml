@@ -19,4 +19,6 @@ jobs:
     name: This should not run if skipped
     runs-on: ubuntu-latest
     needs: check_skip_ci
-    run: echo "Here"
+    steps:
+    - name: You shall not pass
+      run: echo "Here"
