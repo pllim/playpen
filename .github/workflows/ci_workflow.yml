@@ -17,4 +17,6 @@ jobs:
     - name: Install Python dependencies
       run: python -m pip install --upgrade wheel PyGithub
     - name: See if need to skip CI
-      run: python https://raw.githubusercontent.com/pllim/action-skip-ci/main/check_commit_message.py
+      run: |
+        curl -o check_commit_message.py https://raw.githubusercontent.com/pllim/action-skip-ci/main/check_commit_message.py
+        python check_commit_message.py
