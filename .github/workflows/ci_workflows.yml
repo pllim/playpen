@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  pull_request:
+
+jobs:
+  # This action should be a step before you run your tests.
+  check_skip_ci:
+    name: Skip CI
+    runs-on: ubuntu-latest
+    steps:
+    - name: Cancel workflow if CI is skipped
+      uses: pllim/action-skip-ci@main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # This is placeholder for your real tests.
+  tests:
+    name: This should not run if skipped
+    runs-on: ubuntu-latest
+    needs: check_skip_ci
+    steps:
+    - name: You shall not pass
+      run: echo "Here"
