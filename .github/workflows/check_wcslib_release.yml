@@ -5,7 +5,6 @@ on:
     # Weekly Tuesday 6 AM build.
     # * is a special character in YAML so you have to quote this string.
     - cron: '0 6 * * 2'
-  push:
 
 jobs:
   check_wcslib:
@@ -13,6 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check release
-      uses: pllim/actions-check_wcslib_release@ts-action
+      uses: pllim/actions-check_wcslib_release@main
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
