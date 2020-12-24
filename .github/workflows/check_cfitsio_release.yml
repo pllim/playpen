@@ -5,7 +5,7 @@ on:
     # Weekly Tuesday 6 AM build.
     # * is a special character in YAML so you have to quote this string.
     - cron: '0 6 * * 2'
-  pull_request_target:
+  push:
 
 jobs:
   check_cfitsio:
