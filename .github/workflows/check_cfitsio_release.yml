@@ -14,6 +14,6 @@ jobs:
     steps:
     - name: Check release
       uses: pllim/actions-check_cfitsio_release@ts-action
-      env:
+      with:
         CFITSIO_CHECK_N_DAYS: 300
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
