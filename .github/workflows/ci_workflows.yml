@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Cancel workflow if CI is skipped
-      uses: pllim/action-skip-ci@ts-action
+      uses: OpenAstronomy/action-skip-ci@main
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
