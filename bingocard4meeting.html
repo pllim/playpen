@@ -60,6 +60,7 @@ function generateCardItems() {
     idx[i] = i;
   }
 
+  // https://medium.com/@nitinpatel_20236/how-to-shuffle-correctly-shuffle-an-array-in-javascript-15ea3f84bfb
   for (let i = idx.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * i);
     const temp = idx[i];
