@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Bingo card for meeting</title>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<script>
+// Some choices to choose from
+var possible_choices = [
+  "Forgot to unmute",
+  "Please mute",
+  "Pushed the wrong button",
+  "A comment and a question",
+  "Cat walks by",
+  "Dog barking",
+  "Connection dropped",
+  "Kid cameo",
+  "Face too dark",
+  "Sea Shanty",
+  "Phone ringing",
+  "Can you see my screen?",
+  "Meeting runs over time",
+  "Accidental face filter",
+  "Cat shuts down laptop",
+  "Awkward silence",
+  "Sorry, you go first",
+  "Reused the same pun",
+  "Typing over someone else's notes",
+  "Opened the wrong link",
+  "Let's move the discussion to Slack",
+  "Synergy",
+  "Do you want to PR it?",
+  "Do you want to open an issue?",
+  "JIRA",
+  "Circle back",
+  "Sirens sound",
+  "Broken mic",
+  "Echo",
+  "Video froze",
+  "We will wait a few more mins",
+  "AFK when called on"];
+
+function generateCardItems() {
+  // Shuffle choices, then take first N.
+  // Only need 24 because middle is free space.
+  let idx = new Array();
+  let cardItems = [];
+
+  for (let i = 0; i < possible_choices.length; i++) {
+    idx[i] = i;
+  }
+
+  for (let i = idx.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * i);
+    const temp = idx[i];
+    idx[i] = idx[j];
+    idx[j] = temp;
+  }
+
+  for (let i = 0; i < 24; i++) {
+    const n = idx[i];
+    cardItems.push(possible_choices[n]);
+  }
+
+  return cardItems;
+}
+
+function generateCardTable() {
+  let cardItems = generateCardItems();
+  return `<table>
+<tr>
+  <td height="100" width="100">${cardItems[0]}</td>
+  <td width="100">${cardItems[1]}</td>
+  <td width="100">${cardItems[2]}</td>
+  <td width="100">${cardItems[3]}</td>
+  <td width="100">${cardItems[4]}</td>
+</tr>
+<tr>
+  <td height="100">${cardItems[5]}</td>
+  <td>${cardItems[6]}</td>
+  <td>${cardItems[7]}</td>
+  <td>${cardItems[8]}</td>
+  <td>${cardItems[9]}</td>
+</tr>
+<tr>
+  <td height="100">${cardItems[10]}</td>
+  <td>${cardItems[11]}</td>
+  <td><b>FREE</b></td>
+  <td>${cardItems[12]}</td>
+  <td>${cardItems[13]}</td>
+</tr>
+<tr>
+  <td height="100">${cardItems[14]}</td>
+  <td>${cardItems[15]}</td>
+  <td>${cardItems[16]}</td>
+  <td>${cardItems[17]}</td>
+  <td>${cardItems[18]}</td>
+</tr>
+<tr>
+  <td height="100">${cardItems[19]}</td>
+  <td>${cardItems[20]}</td>
+  <td>${cardItems[21]}</td>
+  <td>${cardItems[22]}</td>
+  <td>${cardItems[23]}</td>
+</tr>
+</table>`;
+}
+
+</script>
+
+<h1>Get your bingo card for a meeting</h1>
+
+<!-- User instructions -->
+<p>Click the button below to generate your bingo card and then print it out.</p>
+
+<!-- A button to randomly generate a card -->
+<button type="button"
+onclick="document.getElementById('result').innerHTML = generateCardTable();">
+Generate bingo card</button>
+
+<!-- Render generated card for user to print, FREE space in middle -->
+<p id="result"></p>
+
+</body>
+</html>
