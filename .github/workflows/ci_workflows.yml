@@ -8,33 +8,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Count approvals
-      uses: actions/github-script@v3
+      uses: actions/github-script@v4
       # if: github.event_name == 'pull_request'
       with:
         script: |
-          try {
-            const approvedResponse = await octokit.graphql(`
-              query($name: String!, $owner: String!, $pull_number: Int!) {
-                repository(name: $name, owner: $owner) {
-                  pullRequest(number: $pull_number) {
-                    reviews(states: APPROVED) {
-                      totalCount
-                    }
+          const approvedResponse = await github.graphql(`
+            query($name: String!, $owner: String!, $pull_number: Int!) {
+              repository(name: $name, owner: $owner) {
+                pullRequest(number: $pull_number) {
+                  reviews(states: APPROVED) {
+                    totalCount
                   }
                 }
               }
-            `, {
-              "name": name,
-              "owner": owner,
-              "pull_number": pullNumber
-            });
-            const approvalsRequired = 2;
-            const approvals = approvedResponse.repository.pullRequest.reviews.totalCount;
-            if (approvals < approvalsRequired) {
-              core.setFailed(`Needs ${approvalsRequired} approvals but only has ${approvals}`);
-            } else {
-              console.log(`Needs ${approvalsRequired} approvals and has ${approvals}`);
             }
-          } catch (error) {
-            console.log(`ERROR: ${error}`);
+          `, {
+            "name": name,
+            "owner": owner,
+            "pull_number": pullNumber
+          });
+          const approvalsRequired = 2;
+          const approvals = approvedResponse.repository.pullRequest.reviews.totalCount;
+          if (approvals < approvalsRequired) {
+            core.setFailed(`Needs ${approvalsRequired} approvals but only has ${approvals}`);
+          } else {
+            console.log(`Needs ${approvalsRequired} approvals and has ${approvals}`);
           }
