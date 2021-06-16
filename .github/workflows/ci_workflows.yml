@@ -23,9 +23,9 @@ jobs:
               }
             }
           `, {
-            "name": context.repo.repo,
-            "owner": context.repo.owner,
-            "pull_number": context.issue.number
+            name: context.repo.repo,
+            owner: context.repo.owner,
+            pull_number: context.issue.number
           });
           const approvalsRequired = 2;
           const approvals = approvedResponse.repository.pullRequest.reviews.totalCount;
