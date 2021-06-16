@@ -1,13 +1,11 @@
 name: whoami
 
 on:
-  push:
+  pull_request
 
 jobs:
   showme:
     runs-on: ubuntu-latest
-    # COMMENT OUT TO ENABLE
-    if: github.repository == 'astropy/astropy'
     steps:
     - name: github
       env:
@@ -16,13 +14,13 @@ jobs:
       run: |
         echo $CTX_GITHUB
         echo $CTX_EVENT
-    - name: runner
-      env:
-        CTX_RUNNER: ${{ toJson(runner) }}
-        MY_OS: ${{ runner.os }}
-      run: |
-        echo $CTX_RUNNER
-        echo $MY_OS
+    #- name: runner
+    #  env:
+    #    CTX_RUNNER: ${{ toJson(runner) }}
+    #    MY_OS: ${{ runner.os }}
+    #  run: |
+    #    echo $CTX_RUNNER
+    #    echo $MY_OS
     #- name: job
     #  env:
     #    CTX_JOB: ${{ toJson(job) }}
