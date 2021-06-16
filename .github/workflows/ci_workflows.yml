@@ -12,32 +12,29 @@ jobs:
       # if: github.event_name == 'pull_request'
       with:
         script: |
-            async function evaluateReviews() {
-              try {
-                const approvedResponse = await octokit.graphql(`
-                  query($name: String!, $owner: String!, $pull_number: Int!) {
-                    repository(name: $name, owner: $owner) {
-                      pullRequest(number: $pull_number) {
-                        reviews(states: APPROVED) {
-                          totalCount
-                        }
-                      }
+          try {
+            const approvedResponse = await octokit.graphql(`
+              query($name: String!, $owner: String!, $pull_number: Int!) {
+                repository(name: $name, owner: $owner) {
+                  pullRequest(number: $pull_number) {
+                    reviews(states: APPROVED) {
+                      totalCount
                     }
                   }
-                `, {
-                  "name": name,
-                  "owner": owner,
-                  "pull_number": pullNumber
-                });
-                const approvalsRequired = 2;
-                const approvals = approvedResponse.repository.pullRequest.reviews.totalCount;
-                if (approvals < approvalsRequired) {
-                  core.setFailed(`Needs ${approvalsRequired} approvals but only has ${approvals}`);
-
-                } else {
-                  console.log(`Needs ${approvalsRequired} approvals and has ${approvals`)
                 }
-              } catch (error) {
-                console.log(`ERROR: ${error}`);
               }
+            `, {
+              "name": name,
+              "owner": owner,
+              "pull_number": pullNumber
+            });
+            const approvalsRequired = 2;
+            const approvals = approvedResponse.repository.pullRequest.reviews.totalCount;
+            if (approvals < approvalsRequired) {
+              core.setFailed(`Needs ${approvalsRequired} approvals but only has ${approvals}`);
+            } else {
+              console.log(`Needs ${approvalsRequired} approvals and has ${approvals}`);
             }
+          } catch (error) {
+            console.log(`ERROR: ${error}`);
+          }
