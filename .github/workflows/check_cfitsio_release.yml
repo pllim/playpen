@@ -15,4 +15,5 @@ jobs:
     - name: Check release
       uses: pllim/actions-check_cfitsio_release@main
       with:
+        CFITSIO_CHECK_N_DAYS: 10
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
