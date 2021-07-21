@@ -1,6 +1,7 @@
 name: Check CFITSIO release
 
 on:
+  workflow_dispatch:
   schedule:
     # Weekly Tuesday 6 AM build.
     # * is a special character in YAML so you have to quote this string.
