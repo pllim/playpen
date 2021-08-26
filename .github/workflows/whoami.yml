@@ -2,6 +2,7 @@ name: whoami
 
 on:
   pull_request_target
+  workflow_dispatch
 
 jobs:
   showme:
