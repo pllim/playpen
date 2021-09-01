@@ -1,10 +1,17 @@
 name: whoami
 
-on: ['pull_request_target', 'workflow_dispatch']
+on:
+  pull_request_target:
+  workflow_dispatch:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '30 12 * * *'
 
 jobs:
   showme:
     runs-on: ubuntu-latest
+    # Set to false to not run anything
+    if: true
     steps:
     - name: github
       env:
