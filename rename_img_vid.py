@@ -16,6 +16,60 @@ import os
 __all__ = []
 
 
+def change_ts_from_utc_to_local(path, extension='jpg', utc_offset=-7, verbose=False):
+    """This is very specific to the case when Pam's photos
+    were stamped with local time but mine were stamped in UTC.
+    Since she took way more than I did, it is easier to change
+    everything to local time to match hers. Her seconds stamp
+    is also shorter than mine, which messed up the ordering
+    by filename.
+
+    For other usage, check/modify the logic first, as needed.
+
+    """
+    import datetime
+    from pathlib import Path
+
+    data_path = Path(path).resolve()
+    all_files = sorted(glob.glob(str(data_path / f'*.{extension}')))
+    for cur_filepath in all_files:
+        cur_file = os.path.basename(cur_filepath)
+
+        # Do not touch her files.
+        if cur_filepath.endswith(f'_pam.{extension}'):
+            if verbose:
+                print(f'Skipping {cur_file} (belongs to Pam)')
+            continue
+
+        # Already changed before, skip.
+        parts = cur_file.split('_')
+        timestamp = parts[2].split('.')[0]
+        if len(timestamp) != 9:
+            if verbose:
+                print(f'Skipping {cur_file} (found ts={timestamp})')
+            continue
+
+        try:
+            t = datetime.datetime.strptime(cur_file, 'IMG_%Y%m%d_%H%M%S%f.jpg')
+        except Exception as e:  # Pattern no match, skip
+            if verbose:
+                print(f'Skipping {cur_file} ({repr(e)})')
+            continue
+
+        dt = datetime.timedelta(hours=utc_offset)  # UTC -> local
+        new_t = t + dt
+        new_name = str(data_path / new_t.strftime('IMG_%Y%m%d_%H%M%S.jpg'))
+
+        if os.path.exists(new_name):
+            if verbose:
+                print(f'Skipping {new_name}, file exists')
+            continue
+
+        os.rename(cur_filepath, new_name)
+        if verbose:
+            print(f'{cur_filepath} -> {new_name}')
+
+
 def undo_pxl(path, verbose=False):
     pxl_prefix = 'PXL_'
     for filetype, new_prefix in (('*.jpg', 'IMG_'), ('*.mp4', 'VID_')):
