@@ -84,6 +84,16 @@ def undo_pxl(path, verbose=False):
                         print(f'{filepath} -> {newname}')
 
 
+def undo_whatsapp(path, verbose=False):
+    for filepath in glob.iglob(os.path.join(path, '*-WA*.*')):
+        basename = os.path.basename(filepath)
+        newname = os.path.join(path, basename.replace('-', '_'))
+        if not os.path.exists(newname):
+            os.rename(filepath, newname)
+            if verbose:
+                print(f'{filepath} -> {newname}')
+
+
 def rename_suffix(path, from_suffix='.MP.jpg', to_suffix='_MV.jpg',
                   verbose=False):
     for filepath in glob.iglob(os.path.join(path, f'*{from_suffix}')):
