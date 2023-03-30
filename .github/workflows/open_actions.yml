@@ -1,0 +1,20 @@
+name: "When Opened"
+
+on:
+  issues:
+    types:
+    - opened
+  pull_request_target:
+    types:
+    - opened
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+    # Special action for a special day.
+    - name: Special comment
+      uses: pllim/action-special_pr_comment@main
+      with:
+        SPECIAL_DAYS: 03-30,04-01
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
