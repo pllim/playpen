@@ -3,6 +3,8 @@ name: whoami
 on:
   pull_request:
     types:
+      - opened
+      - reopened
       - synchronize
       - labeled
   workflow_dispatch:
@@ -10,11 +12,18 @@ on:
   #  # * is a special character in YAML so you have to quote this string
   #  - cron:  '5 * * * *'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   showme:
     runs-on: ubuntu-latest
     # Set to false to not run anything
-    if: true
+    #if: false
     steps:
     - name: github
       env:
