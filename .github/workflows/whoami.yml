@@ -2,6 +2,9 @@ name: whoami
 
 on:
   pull_request:
+    types:
+      - synchronize
+      - labeled
   workflow_dispatch:
   #schedule:
   #  # * is a special character in YAML so you have to quote this string
