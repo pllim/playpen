@@ -7,63 +7,153 @@ Examples
 >>> filename_1 = '/path/to/pool_002_image_miri.csv'
 >>> patt = '/another/path/to/jw*.csv'
 >>> score, details = do_match(filename_1, candidates_patt=patt)
-This took 9.8 seconds.
+This took 9.4 seconds.
 
 >>> score.most_common(5)
-[('jw01207_20250329t220818_pool.csv', 1688),
- ('jw01309_20250329t054743_pool.csv', 1688),
- ('jw01538_20250323t143736_pool.csv', 1688),
- ('jw01227_20250329t195159_pool.csv', 1687),
- ('jw01536_20250323t233438_pool.csv', 1687)]
+[('/path/to/jw04496_20250412t204115_pool.csv', 1687),
+ ('/path/to/jw04762_20250311t142127_pool.csv', 1687),
+ ('/path/to/jw06809_20250316t040349_pool.csv', 1687),
+ ('/path/to/jw01293_20250321t150225_pool.csv', 1686),
+ ('/path/to/jw01349_20250319t131303_pool.csv', 1686)]
 
 >>> len(score)
-967
+772
 
->>> details['jw01207_20250329t220818_pool.csv']
-{'BAND': (['NULL'], ['NULL']),
- 'CHANNEL': (['NULL'], ['NULL']),
- 'DETECTOR': (['MIRIMAGE'], ['MIRIMAGE', 'NRS1', 'NRS2']),
- 'DITHERID': (['NULL'], ['1', '2', 'NULL']),
- 'DITHPTIN': ([1], [0, 1, 2, 3, 4]),
- 'EXPOSURE': ([1], [1, 2, 3, 4]),
- 'EXPSPCIN': ([1], [0, 1, 2, 3, 4, 5, 6, 7, 8]),
+>>> details['/path/to/jw04496_20250412t204115_pool.csv']
+{'nrows': (8, 433),
+ 'BAND': (['NULL'], ['LONG', 'MEDIUM', 'NULL', 'SHORT']),
+ 'CHANNEL': (['NULL'], ['12', '34', 'LONG', 'NULL', 'SHORT']),
+ 'DETECTOR': (['MIRIMAGE'],
+  ['MIRIFULONG',
+   'MIRIFUSHORT',
+   'MIRIMAGE',
+   'NIS',
+   'NRCA2',
+   'NRCA3',
+   'NRCA4',
+   'NRCALONG',
+   'NRCB1',
+   'NRCBLONG',
+   'NRS1',
+   'NRS2']),
+ 'DITHERID': (['NULL'], ['1', 'NULL']),
+ 'DITHPTIN': ([1], [0, 1, 2, 3, 4, 5]),
+ 'EXPOSURE': ([1], [1, 2, 3, 4, 5]),
+ 'EXPSPCIN': ([1], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
  'EXP_TYPE': (['MIR_IMAGE'],
-  ['MIR_IMAGE', 'NRS_MSASPEC', 'NRS_MSATA', 'NRS_TACONFIRM']),
+  ['MIR_CORONCAL',
+   'MIR_IMAGE',
+   'MIR_LRS-FIXEDSLIT',
+   'MIR_LRS-SLITLESS',
+   'MIR_MRS',
+   'MIR_TACONFIRM',
+   'MIR_TACQ',
+   'NIS_IMAGE',
+   'NRC_CORON',
+   'NRC_IMAGE',
+   'NRC_TACQ',
+   'NRS_FIXEDSLIT',
+   'NRS_TACONFIRM',
+   'NRS_WATA']),
  'FILTER': (['F560W'],
   ['CLEAR',
+   'F070W',
+   'F090W',
    'F1000W',
-   'F100LP',
+   'F110W',
+   'F1130W',
+   'F115W',
    'F1280W',
    'F1500W',
-   'F170LP',
+   'F150W',
+   'F1550C',
    'F1800W',
+   'F182M',
+   'F200W',
    'F2100W',
+   'F210M',
+   'F212N',
+   'F2300C',
    'F2550W',
+   'F277W',
+   'F335M',
+   'F356W',
+   'F410M',
+   'F430M',
+   'F444W',
+   'F460M',
+   'F480M',
    'F560W',
-   'F770W']),
- 'FXD_SLIT': (['NULL'], ['NULL']),
- 'GRATING': (['NULL'], ['G140M', 'G235M', 'MIRROR', 'NULL']),
- 'INSTRUME': (['MIRI'], ['MIRI', 'NIRSPEC']),
- 'MODULE': (['NULL'], ['NULL']),
- 'MOSTILNO': ([1, 2], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
- 'PATTSIZE': (['NULL'], ['NULL']),
- 'PATTTYPE': (['NULL'], ['4-POINT-SETS', 'NONE', 'NULL']),
- 'PATT_NUM': ([0], [0, 1, 2, 3, 4]),
+   'F770W',
+   'FND',
+   'NULL',
+   'P750L']),
+ 'FXD_SLIT': (['NULL'], ['NULL', 'S1600A1']),
+ 'GRATING': (['NULL'], ['MIRROR', 'NULL', 'PRISM']),
+ 'INSTRUME': (['MIRI'], ['MIRI', 'NIRCAM', 'NIRISS', 'NIRSPEC']),
+ 'MODULE': (['NULL'], ['A', 'B', 'NULL']),
+ 'MOSTILNO': ([1, 2], [0, 1, 2, 3, 4]),
+ 'PATTSIZE': (['NULL'], ['LARGE', 'NULL']),
+ 'PATTTYPE': (['NULL'],
+  ['2-POINT',
+   '4-POINT',
+   '4-POINT-SETS',
+   '5-POINT-NOD',
+   'ALONG-SLIT-NOD',
+   'CYCLING',
+   'IMAGING',
+   'NONE',
+   'NULL',
+   'SUBARRAY_DITHER']),
+ 'PATT_NUM': ([0], [0, 1, 2, 3, 4, 5]),
  'PNTGTYPE': (['SCIENCE'], ['SCIENCE', 'TARGET_ACQUISITION']),
  'PNTG_SEQ': ([1],
-  [1, ...
-   32]),
- 'PUPIL': (['NULL'], ['NULL']),
+  [1,
+   2, ...,
+   36]),
+ 'PUPIL': (['NULL'],
+  ['CLEAR', 'F090W', 'F115W', 'F150W', 'F200W', 'MASKBAR', 'MASKRND', 'NULL']),
  'SEQ_ID': ([1], [1]),
- 'SUBARRAY': (['FULL'], ['FULL']),
- 'TARGETID': ([1], [1, 10, 11, 15]),
+ 'SUBARRAY': (['FULL'],
+  ['BRIGHTSKY',
+   'FULL',
+   'MASK1550',
+   'MASKLYOT',
+   'SLITLESSPRISM',
+   'SUB2048',
+   'SUB256',
+   'SUB32',
+   'SUB320A335R',
+   'SUB320A430R',
+   'SUB400X256ALWB',
+   'SUB512',
+   'SUB64',
+   'SUB640A210R',
+   'SUB640ASWB',
+   'SUB64P',
+   'SUBNDA210R',
+   'SUBNDA335R',
+   'SUBNDA430R',
+   'SUBNDALWBL',
+   'SUBNDALWBS',
+   'SUBNDASWBL',
+   'SUBNDASWBS']),
+ 'TARGETID': ([1], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
  'TARGORDN': ([1], [0, 1]),
  'TARGTYPE': (['FIXED'], ['FIXED']),
  'TEMPLATE': (['MIRI Imaging'],
-  ['MIRI Imaging', 'NIRSpec MultiObject Spectroscopy']),
- 'TSOVISIT': (['F'], ['F']),
- 'VISIT': ([1, 2], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]),
- 'VISITGRP': ([2], [2, 3, 4, 5, 6, 7, 9, 11, 13, 15, 17])}
+  ['MIRI Coronagraphic Photometric Calibration',
+   'MIRI Imaging',
+   'MIRI Low Resolution Spectroscopy',
+   'MIRI Medium Resolution Spectroscopy',
+   'NIRCam Coronagraphic Imaging',
+   'NIRCam Engineering Imaging',
+   'NIRCam Imaging',
+   'NIRISS External Calibration',
+   'NIRSpec Fixed Slit Spectroscopy']),
+ 'TSOVISIT': (['F'], ['F', 'T']),
+ 'VISITGRP': ([2], [2, 3, 4, 5, 6, 8, 10])}
+
 """
 import time
 from collections import Counter
@@ -83,7 +173,8 @@ def do_match(fn_old, candidates_patt="jw*.csv", verbose=True):
 
     for fn_cur in iglob(candidates_patt):
         t_cur = Table.read(fn_cur, delimiter="|", format="ascii")
-        if len(t_cur) == 0:
+        nrows = len(t_cur)
+        if nrows == 0 or nrows > 500:
             continue
         score, details = match_criteria(t_old, t_cur)
         d_scores[fn_cur] = score
@@ -99,7 +190,7 @@ def do_match(fn_old, candidates_patt="jw*.csv", verbose=True):
 def match_criteria(t_old, t_candidate):
     """Higher number is better."""
     score = 0
-    details = {}
+    details = {"nrows": (len(t_old), len(t_candidate))}
     common_colnames = sorted(set(t_old.colnames) & set(t_candidate.colnames))
     scoreboard = {
         "INSTRUME": 1000,
