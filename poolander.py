@@ -61,6 +61,10 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
     d_scores = Counter()
     d_details = {}
 
+    # Force uppercase column names to ensure match with inflight data.
+    t_old.rename_columns(
+        t_old.colnames, list(map(str.upper, t_old.colnames)))
+
     if verbose:
         t_start = time.time()
 
