@@ -69,7 +69,8 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
         t_start = time.time()
 
     for fn_cur in iglob(candidates_patt):
-        if "jw02741" in fn_cur:  # Known irrelevant pools
+        if (("jw02741" in fn_cur) or
+                ("jw0153" in fn_cur)):  # Known irrelevant pools
             continue
 
         t_cur = Table.read(fn_cur, delimiter="|", format="ascii")
