@@ -41,6 +41,7 @@ This took 10.0 seconds.
 
 """
 import os
+import re
 import time
 from collections import Counter
 from glob import iglob
@@ -49,6 +50,7 @@ import numpy as np
 from astropy.table import Table
 
 __all__ = ["do_match", "match_criteria", "sneakpeek"]
+rpatt_asn_cand = r".*\[\(.*, '(.*)'\), \(.*, '(.*)'\)].*"
 
 
 def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
@@ -100,7 +102,10 @@ def match_criteria(t_old, t_candidate, match_type="exact"):
     score = len(t_old) - len(t_candidate)
     details = {"nrows": (len(t_old), len(t_candidate))}
     common_colnames = sorted(set(t_old.colnames) & set(t_candidate.colnames))
+    asn_cand_old = set(re.findall(rpatt_asn_cand, cell)[0]
+                       for cell in t_old["ASN_CANDIDATE"])
     scoreboard = {
+        "ASN_CANDIDATE": 500,
         "BAND": 500,
         "CHANNEL": 500,
         "DETECTOR": 1000,
@@ -121,18 +126,31 @@ def match_criteria(t_old, t_candidate, match_type="exact"):
     }
 
     for colname in common_colnames:
-        if t_old[colname].dtype.type is np.str_:
-            c_old = list(map(str.upper, t_old[colname]))
-        else:
-            c_old = t_old[colname].tolist()
+        if colname == "ASN_CANDIDATE":
+            s1 = asn_cand_old
+            tmp_s2 = []
+            for cell in t_candidate[colname]:
+                m = re.findall(rpatt_asn_cand, cell)
+                if m:
+                    tmp_s2.append(m[0])
+                else:
+                    tmp_s2.append(("nomatch", "nomatch"))
+            s2 = set(tmp_s2)
 
-        if t_candidate[colname].dtype.type is np.str_:
-            c_cur = list(map(str.upper, t_candidate[colname]))
         else:
-            c_cur = t_candidate[colname].tolist()
+            if t_old[colname].dtype.type is np.str_:
+                c_old = list(map(str.upper, t_old[colname]))
+            else:
+                c_old = t_old[colname].tolist()
 
-        s1 = set(c_old)
-        s2 = set(c_cur)
+            if t_candidate[colname].dtype.type is np.str_:
+                c_cur = list(map(str.upper, t_candidate[colname]))
+            else:
+                c_cur = t_candidate[colname].tolist()
+
+            s1 = set(c_old)
+            s2 = set(c_cur)
+
         if ((match_type == "exact" and s1 == s2) or
                 (match_type == "subset" and s1 <= s2)):
             score += scoreboard.get(colname, 1)
