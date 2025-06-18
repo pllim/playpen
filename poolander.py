@@ -62,7 +62,7 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
     d_details = {}
 
     # Known irrelevant pools or calibration programs to ignore.
-    progs_to_ignore = ["jw0153", "jw02741", "jw04492"]
+    progs_to_ignore = ["jw0153", "jw02741", "jw04492", "jw06620"]
 
     # Force uppercase column names to ensure match with inflight data.
     t_old.rename_columns(
