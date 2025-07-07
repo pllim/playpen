@@ -50,7 +50,6 @@ import numpy as np
 from astropy.table import Table
 
 __all__ = ["do_match", "match_criteria", "sneakpeek"]
-rpatt_asn_cand = r".*\[\(.*, '(.*)'\), \(.*, '(.*)'\)].*"
 
 
 def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
@@ -102,8 +101,7 @@ def match_criteria(t_old, t_candidate, match_type="exact"):
     score = len(t_old) - len(t_candidate)
     details = {"nrows": (len(t_old), len(t_candidate))}
     common_colnames = sorted(set(t_old.colnames) & set(t_candidate.colnames))
-    asn_cand_old = set(re.findall(rpatt_asn_cand, cell)[0]
-                       for cell in t_old["ASN_CANDIDATE"])
+    asn_cand_old = _unique_asn_cand_types(t_old["ASN_CANDIDATE"])
     scoreboard = {
         "ASN_CANDIDATE": 500,
         "BAND": 500,
@@ -128,14 +126,7 @@ def match_criteria(t_old, t_candidate, match_type="exact"):
     for colname in common_colnames:
         if colname == "ASN_CANDIDATE":
             s1 = asn_cand_old
-            tmp_s2 = []
-            for cell in t_candidate[colname]:
-                m = re.findall(rpatt_asn_cand, cell)
-                if m:
-                    tmp_s2.append(m[0])
-                else:
-                    tmp_s2.append(("nomatch", "nomatch"))
-            s2 = set(tmp_s2)
+            s2 = _unique_asn_cand_types(t_candidate[colname])
 
         else:
             if t_old[colname].dtype.type is np.str_:
@@ -173,3 +164,13 @@ def sneakpeek(score, details, key, most_common=5):
         d[os.path.basename(fn)] = detail[1]
 
     return d
+
+
+def _unique_asn_cand_types(t_col):
+    rpatt_asn_cand = r", '(\w*)'"
+    output_set = set()
+    for cell in t_col:
+        m = re.findall(rpatt_asn_cand, cell)
+        if m:
+            output_set |= set(sorted(m))
+    return output_set
