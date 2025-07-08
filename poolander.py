@@ -62,12 +62,13 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
     d_scores = Counter()
     d_details = {}
 
-    # Known irrelevant pools or calibration programs to ignore.
-    progs_to_ignore = ["jw0153", "jw02741", "jw04492", "jw06620"]
-
     # Force uppercase column names to ensure match with inflight data.
     t_old.rename_columns(
         t_old.colnames, list(map(str.upper, t_old.colnames)))
+
+    # Known irrelevant pools or calibration programs to ignore.
+    is_cal_old, progs_to_ignore = _get_progs_to_ignore(
+        t_old["EXP_TYPE"], verbose=verbose)
 
     if verbose:
         t_start = time.time()
@@ -82,9 +83,15 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
             continue
 
         t_cur = Table.read(fn_cur, delimiter="|", format="ascii")
+
         nrows = len(t_cur)
         if nrows == 0 or nrows > 500:
             continue
+
+        is_cal_cur = _is_cal(t_cur["EXP_TYPE"])
+        if is_cal_cur is not is_cal_old:
+            continue
+
         score, details = match_criteria(t_old, t_cur, match_type=match_type)
         d_scores[fn_cur] = score
         d_details[fn_cur] = details
@@ -103,10 +110,11 @@ def match_criteria(t_old, t_candidate, match_type="exact"):
     common_colnames = sorted(set(t_old.colnames) & set(t_candidate.colnames))
     asn_cand_old = _unique_asn_cand_types(t_old["ASN_CANDIDATE"])
     scoreboard = {
-        "ASN_CANDIDATE": 500,
+        "ASN_CANDIDATE": 250,
         "BAND": 500,
         "CHANNEL": 500,
         "DETECTOR": 1000,
+        "EXP_TYPE": 100,
         "FILTER": 500,
         "FXD_SLIT": 500,
         "GRATING": 500,
@@ -174,3 +182,49 @@ def _unique_asn_cand_types(t_col):
         if m:
             output_set |= set(sorted(m))
     return output_set
+
+
+def _is_cal(exptype_col):
+    # EXP_TYPE for calibration programs.
+    cal_exptype_by_ins = [
+        # FGS
+        "FGS_ACQ1", "FGS_ACQ2", "FGS_FINEGUIDE", "FGS_ID-IMAGE",
+        "FGS_ID-STACK", "FGS_TRACK",
+        # MIRI
+        "MIR_4QPM", "MIR_CORONCAL", "MIR_DARKALL", "MIR_DARKIMG",
+        "MIR_DARKMRS", "MIR_FLATIMAGE", "MIR_FLATIMAGE-EXT",
+        "MIR_FLATMRS", "MIR_FLATMRS-EXT",
+        # NIRCAM
+        "NRC_DARK", "NRC_FLAT", "NRC_FOCUS", "NRC_LED", "NRC_WFSC",
+        # NIRISS
+        "NIS_DARK", "NIS_EXTCAL", "NIS_FOCUS", "NIS_LAMP",
+        # NIRSPEC
+        "NRS_AUTOFLAT", "NRS_AUTOWAVE", "NRS_CONFIRM", "NRS_DARK",
+        "NRS_FOCUS", "NRS_IMAGE", "NRS_LAMP", "NRS_MIMF", "NRS_VERIFY"
+    ]
+
+    is_cal = False
+    for val in exptype_col:
+        if val.upper() in cal_exptype_by_ins:
+            is_cal = True
+            break
+
+    return is_cal
+
+
+def _get_progs_to_ignore(exptype_col, verbose=True):
+    # Known irrelevant pools or calibration programs to ignore
+    # for science pools.
+    progs_to_ignore = ["jw0153", "jw02741", "jw04492", "jw06620"]
+
+    is_cal = _is_cal(exptype_col)
+
+    if is_cal:
+        if verbose:
+            print("Calibration pool; not ignoring any programs."
+                  f"\n{sorted(set(exptype_col.tolist()))}")
+        return is_cal, []  # Do not ignore any program
+
+    if verbose:
+        print(f"Science pool; ignoring {progs_to_ignore}")
+    return is_cal, progs_to_ignore  # Science!
