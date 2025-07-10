@@ -110,7 +110,7 @@ def match_criteria(t_old, t_candidate, match_type="exact"):
     common_colnames = sorted(set(t_old.colnames) & set(t_candidate.colnames))
     asn_cand_old = _unique_asn_cand_types(t_old["ASN_CANDIDATE"])
     scoreboard = {
-        "ASN_CANDIDATE": 250,
+        "ASN_CANDIDATE": 1000,
         "BAND": 500,
         "CHANNEL": 500,
         "DETECTOR": 1000,
