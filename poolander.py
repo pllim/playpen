@@ -49,7 +49,7 @@ from glob import iglob
 import numpy as np
 from astropy.table import Table
 
-__all__ = ["do_match", "match_criteria", "sneakpeek"]
+__all__ = ["do_match", "match_criteria", "sneakpeek", "apply_filters"]
 
 
 def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
@@ -172,6 +172,39 @@ def sneakpeek(score, details, key, most_common=5):
         d[os.path.basename(fn)] = detail[1]
 
     return d
+
+
+def apply_filters(score, details, filters):
+    """Filters are a list of ``(key, val)``
+    where ``val`` is in one of the values.
+
+    Examples
+    --------
+    >>> apply_filters(score, details, [
+    ...     ('ASN_CANDIDATE', 'BACKGROUND'),
+    ...     ('APERNAME', 'MIRIM_FULL_SLITCNTR'),
+    ...     ('EXP_TYPE', 'MIR_LRS-FIXEDSLIT')])
+
+    """
+    matches = []
+
+    for match_tuple in score.most_common():
+        scoreboard = []
+        fn = match_tuple[0]
+        d = details[fn]
+        for key, val in filters:
+            status = False
+            detail = d[key][1]
+            if key == 'nrows':
+                if val == detail:
+                    status = True
+            elif val in detail:
+                status = True
+            scoreboard.append(status)
+        if scoreboard and np.all(scoreboard):
+            matches.append(fn)
+
+    return matches
 
 
 def _unique_asn_cand_types(t_col):
