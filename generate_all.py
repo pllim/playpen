@@ -10,16 +10,22 @@ def generate_all(filename, is_init=False):
 
     """
     if is_init:
-        patt = r".*import\s([^_]\w*).*"  # FIXME: CSV
+        patt = r".*import\s(.*)"
     else:
-        patt = r"(def|class)\s([^_]\w*).*"  # FIXME: Nested def/class
+        patt = r"(def|class)\s([^_]\w*).*"
     all_list = []
     with open(filename) as fin:
-        for line in fin:
+        for row in fin:
+            if row.startswith(" "):
+                continue
+            line = row.strip()
             m = re.findall(patt, line)
             if m:
                 if is_init:
-                    all_list.append(m[0])
+                    for s in m[0].split(", "):
+                        if s.startswith("_"):
+                            continue
+                        all_list.append(s.split(" ")[0])  # Ditch comment
                 else:
                     for s in m:
                         all_list.append(s[1])
