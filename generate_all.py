@@ -12,7 +12,7 @@ def generate_all(filename, is_init=False):
     if is_init:
         patt = r".*import\s([^_]\w*).*"  # FIXME: CSV
     else:
-        patt = r"(def|class)\s([^_]\w*).*"
+        patt = r"(def|class)\s([^_]\w*).*"  # FIXME: Nested def/class
     all_list = []
     with open(filename) as fin:
         for line in fin:
