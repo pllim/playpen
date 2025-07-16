@@ -10,7 +10,7 @@ def generate_all(filename, is_init=False):
 
     """
     if is_init:
-        patt = r".*import\s([^_]\w*).*"
+        patt = r".*import\s([^_]\w*).*"  # FIXME: CSV
     else:
         patt = r"(def|class)\s([^_]\w*).*"
     all_list = []
