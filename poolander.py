@@ -114,7 +114,7 @@ def match_criteria(t_old, t_candidate, match_type="exact"):
         "BAND": 500,
         "CHANNEL": 500,
         "DETECTOR": 1000,
-        "EXP_TYPE": 100,
+        "EXP_TYPE": 1500,
         "FILTER": 500,
         "FXD_SLIT": 500,
         "GRATING": 500,
@@ -126,6 +126,7 @@ def match_criteria(t_old, t_candidate, match_type="exact"):
     }
     no_match_penalty = {
         "DETECTOR": 1000,
+        "EXP_TYPE": 1000,
         "INSTRUME": 1000,
         "TEMPLATE": 1000,
         "TSOVISIT": 1000,
