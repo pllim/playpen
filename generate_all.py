@@ -16,7 +16,7 @@ def generate_all(filename, is_init=False):
     all_list = []
     with open(filename) as fin:
         for row in fin:
-            if row.startswith(" "):
+            if row.startswith(" ") or row.startswith("#"):
                 continue
             line = row.strip()
             m = re.findall(patt, line)
