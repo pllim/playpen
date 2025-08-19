@@ -53,7 +53,7 @@ __all__ = ["do_match", "match_criteria", "sneakpeek", "apply_filters"]
 
 
 def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
-             verbose=True):
+             verbose=True, debug=False):
     """Given pool file to replace from candidates, find best match.
     Match type can be exact or subset.
 
@@ -78,6 +78,8 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
         for bad_prog in progs_to_ignore:
             if bad_prog in fn_cur:
                 ignore_this = True
+                if debug:
+                    print(f"Skipping bad program {bad_prog}: {fn_cur}")
                 break
         if ignore_this:
             continue
@@ -86,10 +88,14 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
 
         nrows = len(t_cur)
         if nrows == 0 or nrows > 500:
+            if debug:
+                print(f"Skipping nrows={nrows}: {fn_cur}")
             continue
 
         is_cal_cur = _is_cal(t_cur["EXP_TYPE"])
         if is_cal_cur is not is_cal_old:
+            if debug:
+                print(f"Skipping {is_cal_cur}!={is_cal_old}: {fn_cur}")
             continue
 
         score, details = match_criteria(t_old, t_cur, match_type=match_type)
