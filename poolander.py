@@ -53,7 +53,7 @@ __all__ = ["do_match", "match_criteria", "sneakpeek", "apply_filters"]
 
 
 def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
-             verbose=True, debug=False):
+             max_nrows=500, verbose=True, debug=False):
     """Given pool file to replace from candidates, find best match.
 
     Parameters
@@ -74,6 +74,10 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
         * ``'exact'``: Values must be the same exactly.
         * ``'subset'``: Replacement table may contain other stuff
           as long as it also contains all old values.
+
+    max_nrows : int
+        Skip candidates with more than this number of rows to avoid
+        choosing a large program.
 
     verbose : bool
         Print informational text.
@@ -126,7 +130,7 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
         t_cur = Table.read(fn_cur, delimiter="|", format="ascii")
 
         nrows = len(t_cur)
-        if nrows == 0 or nrows > 500:
+        if nrows == 0 or nrows > max_nrows:
             if debug:
                 print(f"Skipping nrows={nrows}: {fn_cur}")
             continue
