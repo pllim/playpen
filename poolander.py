@@ -55,7 +55,40 @@ __all__ = ["do_match", "match_criteria", "sneakpeek", "apply_filters"]
 def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
              verbose=True, debug=False):
     """Given pool file to replace from candidates, find best match.
-    Match type can be exact or subset.
+
+    Parameters
+    ----------
+    fn_old : str
+        Filename of the CSV to be replaced.
+        Provide full path if not in working directory.
+
+    candidates_patt : str
+        Search pattern as accepted by :py:func:`glob.iglob`,
+        or if a single ``.txt`` file is provided, it is assumed
+        to contain a list of CSV files to match against.
+        Provide full path is not in working directory.
+
+    match_type : {'exact', 'subset'}
+        Type of matching to be done for values found in shared columns:
+
+        * ``'exact'``: Values must be the same exactly.
+        * ``'subset'``: Replacement table may contain other stuff
+          as long as it also contains all old values.
+
+    verbose : bool
+        Print informational text.
+
+    debug : bool
+        Print debugging text.
+
+    Returns
+    -------
+    d_scores : :py:class:`~collections.Counter`
+        Ranked matches (filenames with scores).
+
+    d_details : dict
+        Maps each possible replacement filename to full comparison
+        details by common column names.
 
     """
     t_old = Table.read(fn_old, delimiter="|", format="ascii")
@@ -70,10 +103,16 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
     is_cal_old, progs_to_ignore = _get_progs_to_ignore(
         t_old["EXP_TYPE"], verbose=verbose)
 
+    if candidates_patt.endswith(".txt") and os.path.isfile(candidates_patt):
+        with open(candidates_patt) as flist_in:
+            fn_list = [s.strip() for s in flist_in.readlines()]
+    else:
+        fn_list = iglob(candidates_patt)
+
     if verbose:
         t_start = time.time()
 
-    for fn_cur in iglob(candidates_patt):
+    for fn_cur in fn_list:
         ignore_this = False
         for bad_prog in progs_to_ignore:
             if bad_prog in fn_cur:
