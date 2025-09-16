@@ -117,6 +117,15 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
         t_start = time.time()
 
     for fn_cur in fn_list:
+        if fn_cur == fn_old:
+            continue
+
+        prognum = _get_prog(fn_cur)
+        if prognum <= 1000 or prognum >= 10000:
+            if debug:
+                print(f"Skipping non-flight program {prognum}: {fn_cur}")
+            continue
+
         ignore_this = False
         for bad_prog in progs_to_ignore:
             if bad_prog in fn_cur:
@@ -134,6 +143,10 @@ def do_match(fn_old, candidates_patt="jw*.csv", match_type="exact",
             if debug:
                 print(f"Skipping nrows={nrows}: {fn_cur}")
             continue
+
+        # Force uppercase column names to ensure match with input data.
+        t_cur.rename_columns(
+            t_cur.colnames, list(map(str.upper, t_cur.colnames)))
 
         is_cal_cur = _is_cal(t_cur["EXP_TYPE"])
         if is_cal_cur is not is_cal_old:
@@ -185,6 +198,10 @@ def match_criteria(t_old, t_candidate, match_type="exact"):
     }
 
     for colname in common_colnames:
+        # Not useful and clutter output.
+        if colname in ("FILENAME", "OBS_ID", "VISIT_ID"):
+            continue
+
         if colname == "ASN_CANDIDATE":
             s1 = asn_cand_old
             s2 = _unique_asn_cand_types(t_candidate[colname])
@@ -314,3 +331,8 @@ def _get_progs_to_ignore(exptype_col, verbose=True):
     if verbose:
         print(f"Science pool; ignoring {progs_to_ignore}")
     return is_cal, progs_to_ignore  # Science!
+
+
+def _get_prog(fn):
+    # jwNNNNN_blah_blah.csv
+    return int(os.path.basename(fn)[2:7])
