@@ -1,0 +1,19 @@
+name: stalebot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+
+jobs:
+  stalebot:
+    runs-on: ubuntu-latest
+    if: github.repository == 'pllim/playpen'
+    steps:
+      - uses: pllim/action-astropy-stalebot@8aaed2461517bb3d6a093907499bc4798e3de26b  # main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STALEBOT_MAX_ISSUES: -1
+          STALEBOT_MAX_PRS: -1
+          STALEBOT_SLEEP: 10
