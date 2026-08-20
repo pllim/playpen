@@ -15,11 +15,13 @@ from astropy.io import fits
 
 __all__ = ["plot_diff"]
 
+gain = 1.56
+
 
 def get_data_diff(new_out, old_out):
     with fits.open(new_out) as hdulsim, fits.open(old_out) as hdulorig:
-        diff_1 = hdulsim[1].data - hdulorig[1].data
-        diff_4 = hdulsim[4].data - hdulorig[4].data
+        diff_1 = (hdulsim[1].data - hdulorig[1].data) * gain
+        diff_4 = (hdulsim[4].data - hdulorig[4].data) * gain
 
         # Signal on A, corr on B
         xa = diff_4[881, :2048]
@@ -66,8 +68,9 @@ def get_corr(x, amp, pr_num):
 
 
 def plot_diff(pr_num, xmin=0, xmax=41000, ymin=-0.005, ymax=10):
-    old_out = f"pr{pr_num}/iflv38a1q_flt.fits"
-    new_out = f"pr{pr_num}/simtest_flt.fits"
+    ext = "blv_tmp"  # or "flt"
+    old_out = f"pr{pr_num}/iflv38a1q_{ext}.fits"
+    new_out = f"pr{pr_num}/simtest_{ext}.fits"
 
     xa, xb, xc, xd, ya, yb, yc, yd = get_data_diff(new_out, old_out)
 
