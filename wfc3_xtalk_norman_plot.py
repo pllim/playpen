@@ -4,7 +4,7 @@ Examples
 --------
 >>> from wfc3_xtalk_norman_plot import plot_diff
 >>> plot_diff(703)
->>> plot_diff(705)
+>>> plot_diff(705, xmax=1000, ymax=0.1)
 """
 
 from collections import defaultdict
@@ -22,19 +22,19 @@ def get_data_diff(new_out, old_out):
         diff_4 = hdulsim[4].data - hdulorig[4].data
 
         # Signal on A, corr on B
-        xa = hdulorig[4].data[881, :2048]
+        xa = diff_4[881, :2048]
         yb = diff_4[881, 2048:]
 
         # Signal on B, corr on A
-        xb = hdulorig[4].data[1081, 2048:]
+        xb = diff_4[1081, 2048:]
         ya = diff_4[1081, :2048]
 
         # Signal on C, corr on D
-        xc = hdulorig[1].data[900, :2048]
+        xc = diff_1[900, :2048]
         yd = diff_1[900, 2048:]
 
         # Signal on D, corr on C
-        xd = hdulorig[1].data[1100, 2048:]
+        xd = diff_1[1100, 2048:]
         yc = diff_1[1100, :2048]
 
     return xa, xb, xc, xd, ya, yb, yc, yd
@@ -65,8 +65,8 @@ def get_corr(x, amp, pr_num):
     return -y
 
 
-def plot_diff(pr_num):
-    old_out = "main/simtest_flt.fits"
+def plot_diff(pr_num, xmin=0, xmax=41000, ymin=-0.005, ymax=10):
+    old_out = f"pr{pr_num}/iflv38a1q_flt.fits"
     new_out = f"pr{pr_num}/simtest_flt.fits"
 
     xa, xb, xc, xd, ya, yb, yc, yd = get_data_diff(new_out, old_out)
@@ -126,14 +126,14 @@ def plot_diff(pr_num):
     ax11.set_title('D→C Crosstalk (Simulated)')
 
     # Set plot axis limits
-    #ax00.set_xlim(-50, 20000)
-    #ax01.set_xlim(-50, 20000)
-    #ax10.set_xlim(-50, 20000)
-    #ax11.set_xlim(-50, 20000)
-    #ax00.set_ylim(-0.005, 10)
-    #ax01.set_ylim(-0.005, 10)
-    #ax10.set_ylim(-0.005, 10)
-    #ax11.set_ylim(-0.005, 10)
+    ax00.set_xlim(xmin, xmax)
+    ax01.set_xlim(xmin, xmax)
+    ax10.set_xlim(xmin, xmax)
+    ax11.set_xlim(xmin, xmax)
+    ax00.set_ylim(ymin, ymax)
+    ax01.set_ylim(ymin, ymax)
+    ax10.set_ylim(ymin, ymax)
+    ax11.set_ylim(ymin, ymax)
 
     # Clean up layout and display
     plt.tight_layout()
